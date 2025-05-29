@@ -6,6 +6,10 @@ import os
 import torch
 from ultralytics import YOLO
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # this is the folder where app.py lives
+IMAGE_DIR = os.path.join(BASE_DIR, "images")           # absolute path to images folder
+
+
 # === Setup ===
 st.set_page_config(page_title="Boat Detector", layout="wide")
 MODEL_PATHS = {
