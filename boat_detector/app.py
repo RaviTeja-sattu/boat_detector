@@ -3,20 +3,21 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
-import torch
 from ultralytics import YOLO
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # this is the folder where app.py lives
+# === Paths ===
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
 IMAGE_DIR = os.path.join(BASE_DIR, "images")           # absolute path to images folder
-
 
 # === Setup ===
 st.set_page_config(page_title="Boat Detector", layout="wide")
+
 MODEL_PATHS = {
-    "Boat (YOLO)": "models/yolo_boat.pt",
-    "Horizon (U-Net)": "models/unet_horizon_best.pth"  # placeholder for future
+    "Boat (YOLO)": os.path.join(BASE_DIR, "models", "yolo_boat.pt"),
+    "Horizon (U-Net)": os.path.join(BASE_DIR, "models", "unet_horizon_best.pth")  # placeholder
 }
-IMAGE_DIR = "images"
+
+# Load image files from IMAGE_DIR
 image_files = sorted([f for f in os.listdir(IMAGE_DIR) if f.lower().endswith(('.jpg', '.jpeg', '.png'))])
 
 # === Sidebar: Model Choice ===
@@ -41,7 +42,8 @@ def detect_boats(image, model_path):
         x1, y1, x2, y2 = box.astype(int)
         label = f"boat {scores[i]:.2f}"
         cv2.rectangle(img_cv, (x1, y1), (x2, y2), (0, 0, 255), 2)
-        cv2.putText(img_cv, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+        cv2.putText(img_cv, label, (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
     return cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
 
@@ -49,7 +51,7 @@ def detect_boats(image, model_path):
 st.title("🛥️ Boat Detector - Grid Image Selector")
 
 selected_image_path = None
-cols = st.columns(5)  # adjust number of columns for grid
+cols = st.columns(5)  # 5 columns grid
 
 st.subheader("📸 Choose an Image")
 for i, img_name in enumerate(image_files):
@@ -59,7 +61,7 @@ for i, img_name in enumerate(image_files):
         st.image(image, use_container_width=True)
         if st.button(f"Select {img_name}", key=img_name):
             selected_image_path = img_path
-            st.session_state['selected_image'] = img_path  # store in session
+            st.session_state['selected_image'] = img_path  # store selection in session
 
 # === Get Image from Session (if any) ===
 if 'selected_image' in st.session_state:
